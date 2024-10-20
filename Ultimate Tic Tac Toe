@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(TicTacToeUltimate());
+
+class TicTacToeUltimate extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Ultimate Tic Tac Toe',
+      home: GamePage(),
+    );
+  }
+}
+
+class GamePage extends StatefulWidget {
+  @override
+  _GamePageState createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
+  List<List<List<String?>>> board = List.generate(
+      9, (_) => List.generate(3, (_) => List.filled(3, null)));
+  String currentPlayer = 'X';
+  int? selectedSmallBoard;
+
+  void _makeMove(int smallBoardIndex, int row, int col) {
+    if (board[smallBoardIndex][row][col] == null) {
+      setState(() {
+        board[smallBoardIndex][row][col] = currentPlayer;
+        selectedSmallBoard = row * 3 + col;
+        currentPlayer = currentPlayer == 'X' ? 'O' : 'X';
+      });
+    }
+  }
+
+  Widget _buildCell(int smallIndex, int row, int col) {
+    return GestureDetector(
+      onTap: () => _makeMove(smallIndex, row, col),
+      child: Container(
+        margin: EdgeInsets.all(4.0),
+        alignment: Alignment.center,
+        width: 50,
+        height: 50,
+        decoration: BoxDecoration(
+          border: Border.all(),
+          color: board[smallIndex][row][col] == 'O'
+              ? Colors.red
+              : (board[smallIndex][row][col] == 'X' ? Colors.green : null),
+        ),
+        child: Text(
+          board[smallIndex][row][col] ?? '',
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSmallBoard(int smallIndex) {
+    return Column(
+      children: List.generate(3, (row) {
+        return Row(
+          children: List.generate(3, (col) {
+            return _buildCell(smallIndex, row, col);
+          }),
+        );
+      }),
+    );
+  }
+
+  Widget _buildBoard() {
+    return Column(
+      children: List.generate(3, (row) {
+        return Row(
+          children: List.generate(3, (col) {
+            return Container(
+              margin: EdgeInsets.all(4.0),
+              child: _buildSmallBoard(row * 3 + col),
+            );
+          }),
+        );
+      }),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Ultimate Tic Tac Toe')),
+      body: Center(child: _buildBoard()),
+    );
+  }
+}
